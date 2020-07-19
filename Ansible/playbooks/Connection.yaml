@@ -1,0 +1,5 @@
+---
+- name: Checking connection to RPI's
+  hosts: picluster
+  tasks:
+    - ping:

@@ -1,0 +1,9 @@
+---
+- name: Playbook for shutting down the RPI's
+  hosts: picluster
+  tasks:
+    - name: 'Shutdown RPi'
+      shell: sudo shutdown -h now
+      async: 0
+      poll: 0
+      become: true
