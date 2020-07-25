@@ -1,0 +1,23 @@
+---
+- name: RaspberryPi Ops Main Playbook
+  hosts: picluster
+  gather_facts: no
+
+  vars_prompt:
+    - name: "Selection"
+      prompt: "What would you like to do?\n1. Check Connection.\n2. Restart PiCluster.\n3. Shutdown Cluster.\n"
+      private: no
+      default: "0"
+
+  tasks:
+    - name: "Checking Connection"
+      import_role:
+        name: piOps
+        tasks_from: checkConnection.yml
+      when: ( Selection == "1" )
+
+    - name: "Restarting Cluster"
+      import_role:
+        name: piOps
+        tasks_from: restart.yml
+      when: ( Selection == "2" )

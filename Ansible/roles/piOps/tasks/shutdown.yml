@@ -1,0 +1,6 @@
+---
+  - name: 'Shutdown RPi'
+    shell: sudo sleep 5 && shutdown -h now
+    async: 0
+    poll: 0
+    become: true

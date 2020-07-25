@@ -1,0 +1,11 @@
+---
+  - name: "Starting restart."
+    shell: sudo sleep 5 && shutdown -r now
+    become: true
+
+  - name: "Wait for Cluster to come back up."
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 30
+      timeout: 300
