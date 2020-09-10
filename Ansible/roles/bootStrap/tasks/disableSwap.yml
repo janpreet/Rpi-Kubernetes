@@ -1,0 +1,7 @@
+---
+- name: "Permanently disabling swap"
+  shell: |
+    dphys-swapfile swapoff && \
+    dphys-swapfile uninstall && \
+    update-rc.d dphys-swapfile remove
+  become: true

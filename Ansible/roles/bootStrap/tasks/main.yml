@@ -1,0 +1,8 @@
+---
+- include: configKeyboard.yml
+- include: installPexpect.yml
+- include: changePassword.yml
+- include: staticIP.yml
+- include: configPasswordlessSSH.yml
+- include: disableSwap.yml
+- include: configCGroups.yml

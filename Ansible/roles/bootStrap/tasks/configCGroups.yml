@@ -1,0 +1,9 @@
+---
+- name: "Configuring CGroups"
+  lineinfile:
+    path: /boot/cmdline.txt
+    regexp: '^(console(?!.*\b{{ cGroupLine }}\b).*)$'
+    line: '\1 {{ cGroupLine }}'
+    backrefs: yes
+  become: true
+  notify: restart RPi

@@ -1,0 +1,54 @@
+---
+- name: "Reading Router IP"
+  shell: "ip r | grep default"
+  register: ipResult
+  become: true
+
+- name: "Registering Router IP"
+  set_fact:
+    routerIP: "{{ipResult.stdout[12:23]|replace(' ','')}}"
+    cacheable: yes
+
+- name: "Reading Nameserver"
+  shell: "cat /etc/resolv.conf"
+  register: nsResult
+  become: true
+
+- name: "Registering Nameserver"
+  set_fact:
+    nameServer: "{{nsResult.stdout[37:48]|replace(' ','')}}"
+    cacheable: yes
+
+- name: "Reading host IP address"
+  shell: "hostname -I"
+  register: hostnameResult
+  become: true
+
+- set_fact:
+    dhostName: "{{ hostnameResult.stdout|replace(' ','') }}"
+    cacheable: yes
+
+- name: "Registering host IP Address and HostName"
+  set_fact:
+    hostIP: "{{ item.value.newIP }}"
+    nHostName: "{{ item.value.newHostName }}"
+    cacheable: yes
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "dhostName in item.key"
+
+- name: "Configuring DHCPCD"
+  blockinfile:
+    path: /etc/dhcpcd.conf
+    marker: "# ANSIBLE MANAGED BLOCK"
+    insertafter: EOF
+    backup: yes
+    block: |
+      interface eth0
+      static ip_address={{ hostIP }}/24
+      static routers={{ routerIP }}
+      static domain_name_servers={{ nameServer }}
+  become: yes
+
+- name: "Configuring static Hostname"
+  shell: "hostnamectl set-hostname {{ nHostName }}"
+  become: true

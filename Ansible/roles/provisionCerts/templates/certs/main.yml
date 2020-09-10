@@ -1,0 +1,10 @@
+---
+- include: admin-client-csr.j2
+- include: ca-config.j2
+- include: ca-csr.j2
+- include: controller-manager-client-csr.j2
+- include: kube-api-csr.j2
+- include: kube-proxy-client-csr.j2
+- include: kube-scheduler-client-csr.j2
+- include: kubelet-client-csr.j2
+- include: service-account-csr.j2

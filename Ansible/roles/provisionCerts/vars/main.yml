@@ -1,0 +1,21 @@
+---
+ca_expiry: 8760h
+ca_algo: rsa
+ca_size: 2048
+ca_CN: Kubernetes
+ca_C: US
+ca_L: New York
+ca_O: Kubernetes
+ca_OU: NY
+ca_ST: Clifton Park
+
+
+template_dir: "{{ project_root_dir }}/roles/provisionCerts/templates"
+
+certDefaultHostname:
+  - 10.32.0.1
+  - 127.0.0.1
+  - localhost
+  - kubernetes.default
+
+clusterName: kubernetes-the-hard-way

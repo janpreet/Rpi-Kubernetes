@@ -1,0 +1,10 @@
+---
+- hosts: picluster
+  gather_facts: no
+  tasks:
+    - name: 'Installing Pkg'
+      apt:
+        name: "{{ pkgName }}"
+        state: latest
+        update_cache: true
+      become: true

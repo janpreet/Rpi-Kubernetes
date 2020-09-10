@@ -1,0 +1,4 @@
+---
+newPassword: W2h3guru
+cGroupLine: cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+template_dir: "{{ project_root_dir }}/roles/bootStrap/templates"

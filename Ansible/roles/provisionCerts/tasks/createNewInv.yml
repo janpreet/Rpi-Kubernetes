@@ -1,0 +1,12 @@
+---
+- name: Clean-Up
+  file:
+    path: "{{ project_root_dir }}/clusterInv"
+    state: absent
+  delegate_to: localhost
+
+- name: Creating Inventory for New Cluster
+  template:
+    src: "{{ template_dir }}/invs/clusterInv.j2"
+    dest: "{{ project_root_dir }}/clusterInv"
+  delegate_to: localhost
