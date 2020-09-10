@@ -1,0 +1,26 @@
+---
+hosts:
+  defaultIP: 192.168.1.23
+    newIP: 192.168.1.22
+    newHostName: k8-lb
+    newHostType: LoadBalancer
+
+  defaultIP: 192.168.1.24
+    newIP: 192.168.1.23
+    newHostName: k8-m1
+    newHostType: Master
+
+  defaultIP: 192.168.1.25
+    newIP: 192.168.1.24
+    newHostName: k8-m2
+    newHostType: Master
+
+  defaultIP: 192.168.1.26
+    newIP: 192.168.1.25
+    newHostName: k8-w1
+    newHostType: Worker
+
+  defaultIP: 192.168.1.27
+    newIP: 192.168.1.26
+    newHostName: k8-w2
+    newHostType: Worker

@@ -1,0 +1,16 @@
+{
+  "CN": "admin",
+  "key": {
+    "algo": "{{ ca_algo }}",
+    "size": {{ ca_size }}
+  },
+  "names": [
+    {
+      "C": "{{ ca_C }}",
+      "L": "{{ ca_L }}",
+      "O": "system:masters",
+      "OU": "{{ ca_OU }}",
+      "ST": "{{ ca_ST }}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+[all]
+{% for item in hosts_dict.values() %}
+{{ item.newIP }}
+{% endfor %}
+
+[Master]
+{% for item in hosts_dict.values() %}
+{% if item.newHostType == "Master" %}
+{{ item.newIP }}
+{% endif %}
+{% endfor %}
+
+[Worker]
+{% for item in hosts_dict.values() %}
+{% if item.newHostType == "Worker" %}
+{{ item.newIP }}
+{% endif %}
+{% endfor %}
+
+[LoadBalancer]
+{% for item in hosts_dict.values() %}
+{% if item.newHostType == "LoadBalancer" %}
+{{ item.newIP }}
+{% endif %}
+{% endfor %}
+
+[all:vars]
+ansible_user=pi
+ansible_python_interpreter=/usr/bin/python3

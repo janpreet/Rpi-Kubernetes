@@ -1,0 +1,65 @@
+---
+- name: RaspberryPi Ops Main Playbook
+  hosts: all
+  gather_facts: no
+
+  vars_prompt:
+    - name: "Selection"
+      prompt: "What would you like to do?
+      \n1. Check Connection.
+      \n2. Restart PiCluster.
+      \n3. Shutdown Cluster.
+      \n4. Udate Apt.
+      \n5. Upgrade Apt.
+      \n6. Set Master Staic Hostname.
+      \n7. Set Slave Static Hostname.
+      \n"
+      private: no
+      default: "0"
+
+  tasks:
+    - name: "Checking Connection"
+      import_role:
+        name: piOps
+        tasks_from: checkConnection.yml
+      when: ( Selection == "1" )
+
+    - name: "Restarting Cluster"
+      import_role:
+        name: piOps
+        tasks_from: restart.yml
+      when: ( Selection == "2" )
+
+    - name: "Shutdown Cluster"
+      import_role:
+        name: piOps
+        tasks_from: shutdown.yml
+      when: ( Selection == "3" )
+
+    - name: "Updating Apt"
+      import_role:
+        name: piOps
+        tasks_from: update.yml
+      when: ( Selection == "4" )
+
+    - name: "Upgrading Apt"
+      import_role:
+        name: piOps
+        tasks_from: upgrade.yml
+      when: ( Selection == "5" )
+
+    - name: "Setting Master Static Hostname"
+      import_role:
+        name: piOps
+        tasks_from: staticHostname.yml
+      when: ( Selection == "6" )
+
+    - name: "Setting Worker Static Hostname"
+      import_role:
+        name: piOps
+        tasks_from: staticHostname.yml
+      when: ( Selection == "7" )
+
+    - set_fact:
+        Selection: "{{ Selection }}"
+        cacheable: yes

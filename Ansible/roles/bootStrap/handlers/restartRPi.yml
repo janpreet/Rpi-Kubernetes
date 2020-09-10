@@ -1,0 +1,5 @@
+---
+- name: restart RPi
+  shell: "sudo reboot"
+  become: true
+  listen: "restart RPi"

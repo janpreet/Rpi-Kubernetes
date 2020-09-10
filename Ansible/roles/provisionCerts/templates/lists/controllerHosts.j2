@@ -1,0 +1,4 @@
+{% for item in hosts_dict.values() if (item.newHostType == "Master" or item.newHostType == "LoadBalancer") %}
+- {{ item.newIP }}
+- {{ item.newHostName }}
+{% endfor %}

@@ -1,0 +1,16 @@
+{
+  "CN": "system:kube-controller-manager",
+  "key": {
+    "algo": "{{ ca_algo }}",
+    "size": {{ ca_size }}
+  },
+  "names": [
+    {
+      "C": "{{ ca_C }}",
+      "L": "{{ ca_L }}",
+      "O": "system:kube-controller-manager",
+      "OU": "{{ ca_OU }}",
+      "ST": "{{ ca_ST }}"
+    }
+  ]
+}

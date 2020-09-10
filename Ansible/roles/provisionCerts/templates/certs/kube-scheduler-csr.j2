@@ -1,0 +1,16 @@
+{
+  "CN": "system:kube-scheduler",
+  "key": {
+    "algo": "{{ ca_algo }}",
+    "size": {{ ca_size }}
+  },
+  "names": [
+    {
+      "C": "{{ ca_C }}",
+      "L": "{{ ca_L }}",
+      "O": "system:kube-scheduler",
+      "OU": "{{ ca_OU }}",
+      "ST": "{{ ca_ST }}"
+    }
+  ]
+}

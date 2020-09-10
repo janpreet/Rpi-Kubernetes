@@ -1,0 +1,14 @@
+---
+- name: Setting up static Master hostnames
+  shell: "hostnamectl set-hostname k8-m{{ groups['master'].index(inventory_hostname)+1 }}"
+  become: true
+  when:
+    - inventory_hostname in groups['master']
+    - Selection == "6"
+
+- name: Setting up static Worker hostnames
+  shell: "hostnamectl set-hostname k8-w{{ groups['worker'].index(inventory_hostname)+1 }}"
+  become: true
+  when:
+    - inventory_hostname in groups['worker']
+    - Selection == "7"

@@ -1,0 +1,179 @@
+---
+- name: "Clean-up"
+  file:
+    path: "{{ cert_dir }}"
+    state: absent
+  delegate_to: localhost
+
+- name: "Creating temporary directory to store certificates"
+  file:
+    path: "{{ cert_dir }}"
+    state: directory
+  delegate_to: localhost
+
+- name: Creating JSONs
+  template:
+    src: "{{ template_dir }}/certs/{{ item }}.j2"
+    dest: "{{ cert_dir }}/{{ item }}.json"
+  with_items:
+    - ca-config
+    - ca-csr
+    - admin-csr
+    - kube-controller-manager-csr
+    - kube-proxy-csr
+    - kube-scheduler-csr
+    - kubernetes-csr
+    - service-account-csr
+  delegate_to: localhost
+
+- name: Creating JSONs
+  template:
+    src: "{{ template_dir }}/certs/kubelet-client-csr.j2"
+    dest: "{{ cert_dir }}/{{ item.value.newHostName+'-csr' }}.json"
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Worker'"
+  delegate_to: localhost
+
+- name: "Generating Certificate Authority"
+  shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+  args:
+    chdir: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Generating Certificates
+  shell: |
+    cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    {{ item+'-csr' }}.json | cfssljson -bare {{ item }}
+  args:
+    chdir: "{{ cert_dir }}"
+  with_items:
+    - admin
+    - kube-controller-manager
+    - kube-proxy
+    - kube-scheduler
+    - service-account
+  delegate_to: localhost
+
+- name: Generating WorkerNodes Certificates
+  shell: |
+    cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname={{ item.value.newIP }},{{ item.value.newHostName }} \
+    -profile=kubernetes \
+    {{ item.value.newHostName+'-csr' }}.json | cfssljson -bare {{ item.value.newHostName }}
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Worker'"
+  args:
+    chdir: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Generating list of hosts for KubeAPI
+  set_fact:
+    certHostnameList: "{{ certDefaultHostname + lookup('template', '{{ template_dir }}/lists/controllerHosts.j2') | from_yaml }}"
+  delegate_to: localhost
+
+- name: Generating KubeAPI Certificates
+  shell: |
+    cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname={{ certHostnameList|join(',') }} \
+    -profile=kubernetes \
+    kubernetes-csr.json | cfssljson -bare kubernetes
+  args:
+    chdir: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Setting up Kubernetes Address
+  set_fact:
+    KubernetesAddress: "{{ item.value.newIP }}"
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'LoadBalancer'"
+  args:
+    chdir: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Creating Worker Nodes Kube Configs
+  shell: |
+    kubectl config set-cluster {{ clusterName }} \
+      --certificate-authority=ca.pem \
+      --embed-certs=true \
+      --server=https://{{ KubernetesAddress }}:6443 \
+      --kubeconfig={{ item.value.newHostName }}.kubeconfig
+
+    kubectl config set-credentials system:node:{{ item.value.newHostName }} \
+      --client-certificate={{ item.value.newHostName }}.pem \
+      --client-key={{ item.value.newHostName }}-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ item.value.newHostName }}.kubeconfig
+
+    kubectl config set-context default \
+      --cluster={{ clusterName }} \
+      --user=system:node:{{ item.value.newHostName }} \
+      --kubeconfig={{ item.value.newHostName }}.kubeconfig
+
+    kubectl config use-context default --kubeconfig={{ item.value.newHostName }}.kubeconfig
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Worker'"
+  args:
+    chdir: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Creating Kube Proxy Kube Configs
+  shell: |
+    kubectl config set-cluster {{ clusterName }} \
+      --certificate-authority=ca.pem \
+      --embed-certs=true \
+      --server=https://{{ KubernetesAddress }}:6443 \
+      --kubeconfig=kube-proxy.kubeconfig
+
+    kubectl config set-credentials system:kube-proxy \
+      --client-certificate=kube-proxy.pem \
+      --client-key=kube-proxy-key.pem \
+      --embed-certs=true \
+      --kubeconfig=kube-proxy.kubeconfig
+
+    kubectl config set-context default \
+      --cluster={{ clusterName }} \
+      --user=system:kube-proxy \
+      --kubeconfig=kube-proxy.kubeconfig
+
+    kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+  args:
+    chdir: "{{ cert_dir }}"
+  delegate_to: localhost
+
+- name: Creating Kube-Controller-Manager Scheduler and Admin Kube Configs
+  shell: |
+    kubectl config set-cluster {{ clusterName }} \
+      --certificate-authority=ca.pem \
+      --embed-certs=true \
+      --server=https://{{ certDefaultHostname[1] }}:6443 \
+      --kubeconfig={{ item }}.kubeconfig
+
+    kubectl config set-credentials system:{{ item }} \
+      --client-certificate={{ item }}.pem \
+      --client-key={{ item }}-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ item }}.kubeconfig
+
+    kubectl config set-context default \
+      --cluster={{ clusterName }} \
+      --user=system:{{ item }} \
+      --kubeconfig={{ item }}.kubeconfig
+
+    kubectl config use-context default --kubeconfig={{ item }}.kubeconfig
+  args:
+    chdir: "{{ cert_dir }}"
+  with_items:
+    - kube-controller-manager
+    - kube-scheduler
+    - admin
+  delegate_to: localhost

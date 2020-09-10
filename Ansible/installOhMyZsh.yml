@@ -1,0 +1,46 @@
+---
+- hosts: picluster
+  gather_facts: no
+  tasks:
+
+    - name: Updating apt
+      import_role:
+        name: piOps
+        tasks_from: update.yml
+
+    - name: Check if .zsh exists
+      stat:
+        path: ~/.zsh
+      register: is_zsh
+
+    - name: Install zsh
+      apt:
+        pkg:
+        - zsh
+        state: latest
+      register: zsh_installed
+      become: true
+      when: not is_zsh.stat.exists
+
+    - name: Install git
+      apt:
+        pkg:
+        - git
+        state: latest
+      register: git_installed
+      become: true
+
+    - name: installing ohmyzsh
+      shell: "sh -c \"$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
+      become: true
+      register: ohmyzsh_installed
+      when: is_zsh.stat.exists
+
+    - name: Make ohmyzsh default
+      shell: "chsh -s $(which zsh) $(whoami)"
+      become: true
+
+    - name: add ~/.zshrc
+      copy:
+        src=~/.oh-my-zsh/templates/zshrc.zsh-template
+        dest=~/.zshrc

@@ -1,0 +1,15 @@
+---
+- hosts: picluster
+  gather_facts: no
+  tasks:
+    - name: Setting up static hostnames
+      blockinfile:
+        path: /etc/hosts
+        block: |
+            192.168.1.23 k8-m1
+            192.168.1.25 k8-m2
+            192.168.1.26 k8-w1
+            192.168.1.27 k8-w2
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        backup: yes
+      become: true

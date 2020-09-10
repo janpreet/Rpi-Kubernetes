@@ -1,0 +1,39 @@
+---
+ca_expiry: 8760h
+ca_algo: rsa
+ca_size: 2048
+ca_CN: Kubernetes
+ca_C: US
+ca_L: New York
+ca_O: Kubernetes
+ca_OU: NY
+ca_ST: Clifton Park
+
+newPassword: W2h3guru
+cGroupLine: cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+
+hosts:
+  defaultIP: 192.168.1.23
+    newIP: 192.168.1.22
+    newHostName: k8-lb
+    newHostType: LoadBalancer
+
+  defaultIP: 192.168.1.24
+    newIP: 192.168.1.23
+    newHostName: k8-m1
+    newHostType: Master
+
+  defaultIP: 192.168.1.25
+    newIP: 192.168.1.24
+    newHostName: k8-m2
+    newHostType: Master
+
+  defaultIP: 192.168.1.26
+    newIP: 192.168.1.25
+    newHostName: k8-w1
+    newHostType: Worker
+
+  defaultIP: 192.168.1.27
+    newIP: 192.168.1.26
+    newHostName: k8-w2
+    newHostType: Worker

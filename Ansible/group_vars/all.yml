@@ -1,0 +1,29 @@
+---
+project_root_dir: /Users/janpreetsingh/Projects/dev/github/RaspberryPi/Ansible/
+cert_dir: /Users/janpreetsingh/Projects/local/temp/K8-Certs
+
+hosts_dict:
+  192.168.1.20:
+    newIP: 192.168.1.23
+    newHostName: k8-m1
+    newHostType: Master
+
+  192.168.1.21:
+    newIP: 192.168.1.24
+    newHostName: k8-m2
+    newHostType: Master
+
+  192.168.1.22:
+    newIP: 192.168.1.25
+    newHostName: k8-w1
+    newHostType: Worker
+
+  192.168.1.23:
+    newIP: 192.168.1.26
+    newHostName: k8-w2
+    newHostType: Worker
+
+  192.168.1.24:
+    newIP: 192.168.1.22
+    newHostName: k8-lb
+    newHostType: LoadBalancer

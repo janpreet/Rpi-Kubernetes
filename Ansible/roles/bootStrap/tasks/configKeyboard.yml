@@ -1,0 +1,7 @@
+---
+- name: "Configuring US keybaord"
+  replace:
+    path: /etc/default/keyboard
+    regexp: '(?!)gb'
+    replace: "us"
+  become: true
