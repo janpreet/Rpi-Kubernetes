@@ -1,0 +1,118 @@
+---
+#- include: cleanUp.yml
+- name: Installing packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  loop: "{{ wK8sPackages }}"
+  become: yes
+
+- name: Downloading Worker Binaries
+  get_url:
+    url: "{{ binaryURL }}/{{ item }}"
+    dest: ~/
+  loop: "{{ wK8sBinaries }}"
+
+- name: Setting up directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop: "{{ wDir }}"
+  become: yes
+
+- name: Copying Binaries
+  copy:
+    src: "{{ hostHome }}/{{ item }}"
+    dest: "{{ usrLocalBin }}"
+    mode: '0755'
+    remote_src: yes
+  loop: "{{ wK8sBinaries }}"
+  become: yes
+
+#- name: CleaningUp Binaries
+#  file:
+#    path: "{{ hostHome }}/{{ item }}"
+#    state: absent
+#  loop: "{{ wK8sBinaries }}"
+#  become: yes
+
+- name: Downloading CNI Binaries
+  unarchive:
+    src: "{{ cniURL }}"
+    dest: "{{ optCni }}/bin"
+    remote_src: true
+  become: yes
+
+- name: Copying Certs
+  copy:
+    src: "{{ hostHome }}/{{ workerName }}{{ item }}"
+    dest: "{{ varLib }}/kubelet/"
+    remote_src: yes
+  with_items:
+    - -key.pem
+    - .pem
+  become: yes
+
+- name: Copying Kube-Configs
+  copy:
+    src: "{{ hostHome }}/{{ workerName }}.kubeconfig"
+    dest: "{{ varLib }}/kubelet/kubelet.kubeconfig"
+    remote_src: yes
+  become: yes
+
+- name: Copying CA
+  copy:
+    src: "{{ hostHome }}/ca.pem"
+    dest: "{{ varLib }}/kubernetes/"
+    remote_src: yes
+  become: yes
+
+- name: Creating Kubelet config
+  template:
+    src: "{{ template_dir }}/kubelet-config.j2"
+    dest: "{{ varLib }}/kubelet/kubelet-config.yaml"
+  become: yes
+
+- name: Copying Kube-Proxy Kube-Config
+  copy:
+    src: "{{ hostHome }}/{{ item }}"
+    dest: "{{ varLib }}/kube-proxy/{{ item.split('.')[1] }}"
+    remote_src: yes
+  with_items:
+    - kube-proxy.kubeconfig
+  become: yes
+
+- name: Creating Kube-Proxy Config
+  template:
+    src: "{{ template_dir }}/kube-proxy-config.j2"
+    dest: "{{ varLib }}/kube-proxy/kube-proxy-config.yaml"
+  become: yes
+
+- name: Creating Kube-Proxy Unit File
+  template:
+    src: "{{ template_dir }}/{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  loop: "{{ wK8sBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Starting kubelet kube-proxy and Reloading Daemon
+  systemd:
+    name: "{{ item }}"
+    state: started
+    daemon_reload: yes
+  loop: "{{ wK8sBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Enabling Services to start when system boots-up
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+  loop: "{{ wK8sBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Configuring IP Forwarding
+  sysctl:
+    name: net.ipv4.conf.all.forwarding
+    value: '1'
+    state: present
+  become: yes

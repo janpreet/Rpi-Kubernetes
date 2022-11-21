@@ -1,0 +1,13 @@
+---
+template_dir: "{{ project_root_dir }}/roles/etcd/templates"
+
+etcdVersion: etcd-3.1.5-arm
+binaryURL: https://raw.githubusercontent.com/robertojrojas/kubernetes-the-hard-way-raspberry-pi/master/etcd/{{ etcdVersion }}.tar.gz
+
+etcEtcd: /etc/etcd/
+varLibEtcd: /var/lib/etcd/
+
+cFiles:
+  - ca.pem
+  - kubernetes-key.pem
+  - kubernetes.pem

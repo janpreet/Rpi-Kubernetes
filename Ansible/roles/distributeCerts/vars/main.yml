@@ -1,0 +1,2 @@
+---
+template_dir: "{{ project_root_dir }}/roles/distributeCerts/templates"

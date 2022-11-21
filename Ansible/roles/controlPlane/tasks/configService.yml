@@ -1,0 +1,32 @@
+---
+- set_fact:
+    internal_IP: "{{ controllerIP }}"
+    etcdCluster: "{{ lookup('template', '{{ template_dir }}/lists/etcdCluster.j2') | from_yaml }}"
+
+- name: Setting up Systemd Unit files
+  template:
+    src: "{{ template_dir }}/scripts/{{ item }}.j2"
+    dest: /etc/systemd/system/{{ item }}.service
+  loop: "{{ cpBinaries | reject('search','kubectl') | list }}"
+  become: true
+
+- name: Setting up Kube-Scheduler Config files
+  template:
+    src: "{{ template_dir }}/configs/kube-scheduler.j2"
+    dest: "{{ etcK8sConfig }}/kube-scheduler.yaml"
+  become: true
+
+- name: Starting kube-apiserver kube-controller-manager kube-scheduler and Reloading Daemon
+  systemd:
+    name: "{{ item }}"
+    state: started
+    daemon_reload: yes
+  loop: "{{ cpBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Enabling Services to start when system boots-up
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+  loop: "{{ cpBinaries | reject('search','kubectl') | list }}"
+  become: yes

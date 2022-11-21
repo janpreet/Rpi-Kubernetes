@@ -1,0 +1,40 @@
+---
+template_dir: "{{ project_root_dir }}/roles/worker/templates"
+files_dir: "{{ project_root_dir }}/roles/worker/files"
+
+wHttpsPackages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg2
+  - software-properties-common
+
+wK8sPackages:
+  - socat
+  - conntrack
+  - ipset
+
+cniURL: https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-arm-v0.6.0.tgz
+
+wK8sBinaries:
+  - kubectl
+  - kubelet
+  - kube-proxy
+
+wDockerGPG: https://download.docker.com/linux/debian/gpg
+wDockerRepo: deb [arch=armhf] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+
+etcDockerLine: DOCKER_OPTS="--iptables=false --ip-masq=false"
+
+etcCni: /etc/cni
+optCni: /opt/cni
+varLib: /var/lib
+varRun: /var/run
+
+wDir:
+  - "{{ etcCni }}/net.d"
+  - "{{ optCni }}/bin"
+  - "{{ varLib }}/kubelet"
+  - "{{ varLib }}/kube-proxy"
+  - "{{ varLib }}/kubernetes"
+  - "{{ varRun }}/kubernetes"

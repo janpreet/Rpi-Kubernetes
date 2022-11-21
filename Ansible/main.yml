@@ -1,0 +1,6 @@
+---
+- import_playbook: dCerts.yml
+- import_playbook: etcd.yml
+- import_playbook: controlPlane.yml
+- import_playbook: loadBalancer.yml
+- import_playbook: worker.yml

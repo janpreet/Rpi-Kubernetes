@@ -1,0 +1,13 @@
+---
+#MAINTAINED BY ANSIBLE.
+#Changes made here will be over-written.
+
+wFiles:
+  - {{ item.value.newHostName }}.pem
+  - {{ item.value.newHostName }}-key.pem
+  - {{ item.value.newHostName }}.kubeconfig
+  - ca.pem
+  - kube-proxy.kubeconfig
+
+workerName: {{ item.value.newHostName }}
+workerIP: {{ item.value.newIP }}

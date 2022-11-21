@@ -1,0 +1,7 @@
+---
+- hosts: Worker
+  gather_facts: no
+  tasks:
+    - name: Deleting all Docker images
+      shell: docker rmi $(docker images -a -q)
+      become: yes

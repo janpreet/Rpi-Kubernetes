@@ -1,0 +1,122 @@
+---
+- name: Uninstalling Docker
+  apt:
+    name: docker-ce
+    state: absent
+  become: yes
+
+- name: Removing Docker apt Repository
+  apt_repository:
+    repo: "{{ wDockerRepo }}"
+    state: absent
+    filename: docker
+  become: yes
+
+- name: Uninstalling packages
+  apt:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ wHttpsPackages }}"
+  become: yes
+
+- name: Disabling Services to start when system boots-up
+  systemd:
+    name: "{{ item }}"
+    enabled: no
+  loop: "{{ wK8sBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Stopping kubelet kube-proxy and Reloading Daemon
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    daemon_reload: yes
+  loop: "{{ wK8sBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Deleting Kube-Proxy Unit File
+  file:
+    path: "/etc/systemd/system/{{ item }}.service"
+    state: absent
+  loop: "{{ wK8sBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Deleting Kube-Proxy Config
+  file:
+    path: "{{ varLib }}/kube-proxy/kube-proxy-config.yaml"
+    state: absent
+  become: yes
+
+- name: Deleting Kube-Proxy Kube-Config
+  file:
+    path: "{{ varLib }}/kube-proxy/kubeconfig"
+    state: absent
+  become: yes
+
+- name: Deleting Kubelet config
+  file:
+    path: "{{ varLib }}/kubelet/kubelet-config.yaml"
+    state: absent
+  become: yes
+
+- name: Deleting CA
+  file:
+    path: "{{ varLib }}/kubernetes/"
+    state: absent
+  become: yes
+
+- name: Deleting Kube-Configs
+  file:
+    path: "{{ varLib }}/kubelet/kubeconfig/"
+    state: absent
+  become: yes
+
+- name: Deleting Certs
+  file:
+    path: "{{ varLib }}/kubelet/"
+    state: absent
+  with_items:
+    - -key.pem
+    - .pem
+  become: yes
+
+- name: Removing directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ wDir }}"
+  become: yes
+
+- name: Removing Binaries
+  file:
+    path: "{{ usrLocalBin }}{{ item }}"
+    state: absent
+  loop: "{{ wK8sBinaries }}"
+  become: true
+
+- name: Final Cleanup
+  file:
+    path: "{{ hostHome }}/{{ item }}"
+    state: absent
+  loop: "{{ wFiles }}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

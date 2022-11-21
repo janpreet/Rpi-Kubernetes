@@ -1,0 +1,52 @@
+---
+- name: Installing NGINX
+  apt:
+    name: nginx
+    update_cache: yes
+    state: present
+  become: yes
+
+- name: Cleaning up tcpconf.d
+  file:
+    path: "{{ etcNginx }}/tcpconf.d/"
+    state: absent
+  become: true
+
+- name: Cleaning up nginx.conf
+  lineinfile:
+    path: "{{ etcNginx }}/nginx.conf"
+    line: "{{ nginxConfLine }}"
+    state: absent
+  become: yes
+
+- name: Setting up tcpconf.d
+  file:
+    path: "{{ etcNginx }}/tcpconf.d"
+    state: directory
+  become: yes
+
+- name: Configuring nginx.conf
+  lineinfile:
+    path: "{{ etcNginx }}/nginx.conf"
+    line: "{{ nginxConfLine }}"
+    insertafter: EOF
+    create: yes
+  become: yes
+
+- name: Setting up kubernetes.conf
+  template:
+    src: "{{ template_dir }}/kubernetes.j2"
+    dest: "{{ etcNginx }}/tcpconf.d/kubernetes.conf"
+  become: yes
+
+- name: Restarting NGINX
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+
+- name: Enabling NGINX to start when system boots-up
+  systemd:
+    name: nginx
+    enabled: yes
+  become: yes

@@ -1,0 +1,5 @@
+---
+- hosts: withoutLB
+  gather_facts: no
+  roles:
+    - distributeCerts

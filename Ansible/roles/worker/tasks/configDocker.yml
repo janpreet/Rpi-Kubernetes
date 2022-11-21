@@ -1,0 +1,42 @@
+---
+- name: Updating apt and installing packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  loop: "{{ wHttpsPackages }}"
+
+- name: Adding Docker GPG key
+  apt_key:
+    url: "{{ wDockerGPG }}"
+    state: present
+
+- name: Adding Docker apt Repository
+  apt_repository:
+    repo: "{{ wDockerRepo }}"
+    state: present
+    filename: docker
+
+- name: Updating apt and installing Docker
+  apt:
+    name: docker-ce
+    update_cache: yes
+
+- name: Flushing ipTables NAT
+  iptables:
+    table: nat
+    flush: yes
+
+- name: Removing Docker Network Bridge
+  shell: "{{ item }}"
+  with_items:
+    - ip link set docker0 down
+    - ip link delete docker0
+
+- name: Configuring Docker to disable iptables
+  lineinfile:
+    path: /etc/default/docker
+    line: "{{ etcDockerLine }}"
+    insertafter: EOF
+    state: present
+
+

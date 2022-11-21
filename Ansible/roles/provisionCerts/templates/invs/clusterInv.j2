@@ -1,4 +1,7 @@
-[all]
+#MAINTAINED BY ANSIBLE.
+#Changes made here will be over-written.
+
+[Cluster]
 {% for item in hosts_dict.values() %}
 {{ item.newIP }}
 {% endfor %}
@@ -24,6 +27,13 @@
 {% endif %}
 {% endfor %}
 
-[all:vars]
+[withoutLB]
+{% for item in hosts_dict.values() %}
+{% if (item.newHostType == "Worker" or item.newHostType == "Master") %}
+{{ item.newIP }}
+{% endif %}
+{% endfor %}
+
+[Cluster:vars]
 ansible_user=pi
 ansible_python_interpreter=/usr/bin/python3

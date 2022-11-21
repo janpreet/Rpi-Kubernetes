@@ -1,0 +1,30 @@
+---
+- name: Clean up sudo
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ etcEtcd }}"
+    - "{{ usrLocalBin }}etcd"
+    - "{{ usrLocalBin }}etcdctl"
+    - "{{ varLibEtcd }}"
+  become: true
+
+- name: Stopping ETCD and Reloading Daemon
+  systemd:
+    name: etcd
+    state: stopped
+    daemon_reload: yes
+  become: yes
+
+- name: Disabling ETCD
+  systemd:
+    name: etcd
+    enabled: no
+  become: yes
+
+- name: Deleting up Systemd Unit file
+  file:
+    path: /etc/systemd/system/etcd.service
+    state: absent
+  become: true

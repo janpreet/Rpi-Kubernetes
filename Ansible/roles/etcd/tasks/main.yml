@@ -1,0 +1,4 @@
+---
+- include: setupBinaries.yml
+- include: configService.yml
+#- include: cleanUp.yml
