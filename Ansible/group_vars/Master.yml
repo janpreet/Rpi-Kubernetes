@@ -1,0 +1,19 @@
+---
+#MAINTAINED BY ANSIBLE.
+#Changes made here will be over-written.
+
+wFiles:
+  - ca.pem
+  - ca-key.pem
+  - kubernetes-key.pem
+  - kubernetes.pem
+  - admin.kubeconfig
+  - kube-controller-manager.kubeconfig
+  - kube-scheduler.kubeconfig
+  - encryption-config.yaml
+  - service-account-key.pem
+  - service-account.pem
+
+controller0_IP: 192.168.1.23
+controller1_IP: 192.168.1.24
+

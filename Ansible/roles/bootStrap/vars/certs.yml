@@ -9,7 +9,7 @@ ca_O: Kubernetes
 ca_OU: NY
 ca_ST: Clifton Park
 
-newPassword: W2h3guru
+newPassword: examplePassword
 cGroupLine: cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
 
 hosts:

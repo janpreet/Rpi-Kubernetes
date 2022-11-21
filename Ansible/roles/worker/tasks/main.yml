@@ -1,0 +1,6 @@
+---
+- include: configDocker.yml
+  become: yes
+- include: configK8s.yml
+#- include: cleanUp.yml
+#  become: yes

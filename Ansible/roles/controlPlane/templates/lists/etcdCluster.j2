@@ -1,0 +1,5 @@
+{% for item in hosts_dict.values() %}
+{% if item.newHostType == "Master" %}
+- https://{{ item.newIP }}:2379
+{% endif %}
+{% endfor %}

@@ -1,0 +1,3 @@
+---
+#- include: configNetwork.yml
+- include: cleanUp.yml

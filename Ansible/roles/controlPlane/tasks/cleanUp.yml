@@ -1,0 +1,44 @@
+---
+- name: Deleting Binaries
+  file:
+    path: "{{ usrLocalBin }}/{{ item }}"
+    state: absent
+  loop: "{{ cpBinaries }}"
+  become: true
+
+- name: Stopping kube-apiserver kube-controller-manager kube-scheduler and Reloading Daemon
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    daemon_reload: yes
+  loop: "{{ cpBinaries | reject('search','kubectl') | list }}"
+  become: yes
+
+- name: Disabling Services
+  systemd:
+    name: "{{ item }}"
+    enabled: no
+  loop: "{{ cpBinaries | reject('search','kubectl') | list }}"
+  become: true
+
+- name: Deleting Systemd Unit files
+  file:
+    path: /etc/systemd/system/{{ item }}.service
+    state: absent
+  loop: "{{ cpBinaries | reject('search','kubectl') | list }}"
+  become: true
+
+- name: Deleting Directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ etcK8s }}"
+    - "{{ varLibK8s }}"
+  become: true
+
+- name: Deleting Certs
+  file:
+    path: "{{ hostHome }}/{{ item }}"
+    state: absent
+  loop: "{{ wFiles }}"

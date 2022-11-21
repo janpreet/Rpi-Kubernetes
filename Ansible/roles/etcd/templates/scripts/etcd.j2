@@ -1,0 +1,30 @@
+[Unit]
+Description=etcd
+Documentation=https://github.com/coreos
+
+[Service]
+Environment='ETCD_UNSUPPORTED_ARCH=arm'
+Type=notify
+ExecStart={{ usrLocalBin }}etcd \
+  --name {{ controllerName }} \
+  --cert-file={{ etcEtcd }}kubernetes.pem \
+  --key-file={{ etcEtcd }}kubernetes-key.pem \
+  --peer-cert-file={{ etcEtcd }}kubernetes.pem \
+  --peer-key-file={{ etcEtcd }}kubernetes-key.pem \
+  --trusted-ca-file={{ etcEtcd }}ca.pem \
+  --peer-trusted-ca-file={{ etcEtcd }}ca.pem \
+  --peer-client-cert-auth \
+  --client-cert-auth \
+  --initial-advertise-peer-urls https://{{ controllerIP }}:2380 \
+  --listen-peer-urls https://{{ controllerIP }}:2380 \
+  --listen-client-urls https://{{ controllerIP }}:2379,https://{{ certDefaultHostname[1] }}:2379 \
+  --advertise-client-urls https://{{ controllerIP }}:2379 \
+  --initial-cluster-token etcd-cluster-0 \
+  --initial-cluster {{ initialCluster|join(',') }} \
+  --initial-cluster-state new \
+  --data-dir={{ varLibEtcd }}
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

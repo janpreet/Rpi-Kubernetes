@@ -1,0 +1,22 @@
+---
+- set_fact:
+    initialCluster: "{{ lookup('template', '{{ template_dir }}/lists/iniCluster.j2') | from_yaml }}"
+
+- name: Setting up Systemd Unit file
+  template:
+    src: "{{ template_dir }}/scripts/etcd.j2"
+    dest: /etc/systemd/system/etcd.service
+  become: true
+
+- name: Starting ETCD and Reloading Daemon
+  systemd:
+    name: etcd
+    state: started
+    daemon_reload: yes
+  become: yes
+
+- name: Enabling ETCD to start when system boots-up
+  systemd:
+    name: etcd
+    enabled: yes
+  become: yes

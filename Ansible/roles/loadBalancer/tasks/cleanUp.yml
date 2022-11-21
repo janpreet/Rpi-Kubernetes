@@ -1,0 +1,30 @@
+- name: Disabling NGINX
+  systemd:
+    name: nginx
+    enabled: no
+  become: yes
+
+- name: Stopping NGINX
+  service:
+    name: nginx
+    state: stopped
+  become: yes
+
+- name: Cleaning up tcpconf.d
+  file:
+    path: "{{ etcNginx }}/tcpconf.d/"
+    state: absent
+  become: true
+
+- name: Cleaning up nginx.conf
+  lineinfile:
+    path: "{{ etcNginx }}/nginx.conf"
+    line: "{{ nginxConfLine }}"
+    state: absent
+  become: yes
+
+- name: Unintalling NGINX
+  apt:
+    name: nginx
+    state: absent
+  become: yes

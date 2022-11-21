@@ -1,0 +1,13 @@
+---
+template_dir: "{{ project_root_dir }}/roles/controlPlane/templates"
+files_dir: "{{ project_root_dir }}/roles/controlPlane/files"
+
+etcK8s: /etc/kubernetes
+etcK8sConfig: "{{ etcK8s }}/config"
+varLibK8s: /var/lib/kubernetes
+
+cpBinaries:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubectl

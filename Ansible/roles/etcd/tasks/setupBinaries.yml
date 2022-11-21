@@ -1,0 +1,41 @@
+---
+- name: Downloading ETCD Binaries
+  unarchive:
+    src: "{{ binaryURL }}"
+    dest: ~/
+    remote_src: True
+
+- name: Copying Binaries
+  copy:
+    src: "{{ hostHome }}/{{ etcdVersion }}/{{ item }}"
+    dest: "{{ usrLocalBin }}"
+    mode: '0755'
+    remote_src: yes
+  with_items:
+    - etcd
+    - etcdctl
+  become: true
+
+- name: Setting up Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ etcEtcd }}"
+    - "{{ varLibEtcd }}"
+  become: true
+
+- name: Moving Certs
+  copy:
+    src: "{{ hostHome }}/{{ item }}"
+    dest: "{{ etcEtcd }}"
+    remote_src: yes
+  loop: "{{ cFiles }}"
+  become: true
+
+- name: Clean up
+  file:
+    path: "{{ hostHome }}/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ etcdVersion }}"

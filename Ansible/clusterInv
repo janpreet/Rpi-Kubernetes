@@ -1,4 +1,7 @@
-[all]
+#MAINTAINED BY ANSIBLE.
+#Changes made here will be over-written.
+
+[Cluster]
 192.168.1.23
 192.168.1.24
 192.168.1.25
@@ -16,6 +19,12 @@
 [LoadBalancer]
 192.168.1.22
 
-[all:vars]
+[withoutLB]
+192.168.1.23
+192.168.1.24
+192.168.1.25
+192.168.1.26
+
+[Cluster:vars]
 ansible_user=pi
 ansible_python_interpreter=/usr/bin/python3

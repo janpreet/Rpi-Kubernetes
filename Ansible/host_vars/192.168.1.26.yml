@@ -1,0 +1,13 @@
+---
+#MAINTAINED BY ANSIBLE.
+#Changes made here will be over-written.
+
+wFiles:
+  - k8-w2.pem
+  - k8-w2-key.pem
+  - k8-w2.kubeconfig
+  - ca.pem
+  - kube-proxy.kubeconfig
+
+workerName: k8-w2
+workerIP: 192.168.1.26

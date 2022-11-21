@@ -1,0 +1,21 @@
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart={{ usrLocalBin }}kubelet \
+  --config={{ varLib }}/kubelet/kubelet-config.yaml \
+  --image-pull-progress-deadline=2m \
+  --kubeconfig={{ varLib }}/kubelet/kubelet.kubeconfig \
+  --network-plugin={{ networkPlugin }} \
+  --register-node=true \
+  --hostname-override={{ workerName }} \
+  --allow-privileged=true \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

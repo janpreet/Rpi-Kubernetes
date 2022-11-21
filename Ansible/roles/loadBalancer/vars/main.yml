@@ -1,0 +1,6 @@
+---
+template_dir: "{{ project_root_dir }}/roles/loadBalancer/templates"
+
+nginxConfLine: include /etc/nginx/tcpconf.d/*;
+
+etcNginx: /etc/nginx

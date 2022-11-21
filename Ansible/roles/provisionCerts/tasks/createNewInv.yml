@@ -10,3 +10,47 @@
     src: "{{ template_dir }}/invs/clusterInv.j2"
     dest: "{{ project_root_dir }}/clusterInv"
   delegate_to: localhost
+
+- name: Clean-up Worker Files
+  file:
+    path: "{{ project_root_dir }}/host_vars/{{ item.value.newIP }}.yml"
+    state: absent
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Worker'"
+  delegate_to: localhost
+
+- name: Clean-up Controller group_vars Files
+  file:
+    path: "{{ project_root_dir }}/group_vars/Master.yml"
+    state: absent
+  delegate_to: localhost
+
+- name: Clean-up Controller host_vars Files
+  file:
+    path: "{{ project_root_dir }}/host_vars/{{ item.value.newIP }}.yml"
+    state: absent
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Master'"
+  delegate_to: localhost
+
+- name: Creating worker Files
+  template:
+    src: "{{ template_dir }}/lists/workerFiles.j2"
+    dest: "{{ project_root_dir }}/host_vars/{{ item.value.newIP }}.yml"
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Worker'"
+  delegate_to: localhost
+
+- name: Creating Controller Files
+  template:
+    src: "{{ template_dir }}/lists/controllerFiles.j2"
+    dest: "{{ project_root_dir }}/group_vars/Master.yml"
+  delegate_to: localhost
+
+- name: Creating Controller host_vars Files
+  template:
+    src: "{{ template_dir }}/lists/controllerHostVars.j2"
+    dest: "{{ project_root_dir }}/host_vars/{{ item.value.newIP }}.yml"
+  loop: "{{ lookup('dict', hosts_dict) }}"
+  when: "item.value.newHostType == 'Master'"
+  delegate_to: localhost

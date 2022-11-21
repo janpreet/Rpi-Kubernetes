@@ -1,0 +1,39 @@
+---
+- name: Downloading Control Plane Binaries
+  get_url:
+    url: "{{ binaryURL }}/{{ item }}"
+    dest: ~/
+  loop: "{{ cpBinaries }}"
+
+- name: Copying Binaries
+  copy:
+    src: "{{ hostHome }}/{{ item }}"
+    dest: "{{ usrLocalBin }}"
+    mode: '0755'
+    remote_src: yes
+  loop: "{{ cpBinaries }}"
+  become: true
+
+- name: Deleting binaries
+  file:
+    path: "{{ hostHome }}/{{ item }}"
+    state: absent
+  loop: "{{ cpBinaries }}"
+
+- name: Setting up Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ etcK8s }}"
+    - "{{ etcK8sConfig }}"
+    - "{{ varLibK8s }}"
+  become: true
+
+- name: Copying files
+  copy:
+    src: "{{ hostHome }}/{{ item }}"
+    dest: "{{ varLibK8s }}"
+    remote_src: yes
+  loop: "{{ wFiles | reject('search','admin.kubeconfig') | list }}"
+  become: true

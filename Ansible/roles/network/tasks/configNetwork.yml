@@ -1,0 +1,14 @@
+---
+- name: Deploying Newtwork Plugin
+  k8s:
+    state: present
+    kubeconfig: "~/admin.kubeconfig"
+    definition: "{{ lookup('file', '{{ files_dir }}/weave-daemonset-k8s-1.7.yaml') }}"
+  when: inventory_hostname == groups.Master[0]
+
+#- name: Deploying Kube-DNS
+#  k8s:
+#    state: present
+#    kubeconfig: "~/admin.kubeconfig"
+#    definition: "{{ lookup('file', '{{ files_dir }}/kube-dns.yml') }}"
+#  when: inventory_hostname == groups.Master[0]

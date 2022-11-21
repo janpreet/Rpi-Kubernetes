@@ -11,7 +11,7 @@
     state: directory
   delegate_to: localhost
 
-- name: Creating JSONs
+- name: Creating config JSONs
   template:
     src: "{{ template_dir }}/certs/{{ item }}.j2"
     dest: "{{ cert_dir }}/{{ item }}.json"
@@ -176,4 +176,18 @@
     - kube-controller-manager
     - kube-scheduler
     - admin
+  delegate_to: localhost
+
+- name: Generating Data Encryption Key
+  shell: head -c 32 /dev/urandom | base64
+  register: encryptKey
+  delegate_to: localhost
+
+- set_fact:
+    clusterEncryptionKey: "{{ encryptKey.stdout }}"
+
+- name: Generating Data Encryption Config
+  template:
+    src: "{{ template_dir }}/configs/encryption-config.j2"
+    dest: "{{ cert_dir }}/encryption-config.yaml"
   delegate_to: localhost

@@ -1,0 +1,10 @@
+---
+- name: Creating and Binding Cluster Role
+  k8s:
+    state: present
+    kubeconfig: "~/admin.kubeconfig"
+    definition: "{{ lookup('file', '{{ files_dir }}/{{ item }}.yml') }}"
+  with_items:
+    - clusterRole
+    - clusterRoleBinding
+  when: inventory_hostname == groups.Master[0]
